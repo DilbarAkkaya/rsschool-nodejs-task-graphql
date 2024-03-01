@@ -1,22 +1,9 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
-import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
+import { createGqlResponseSchema, gqlResponseSchema, schema } from './schemas.js';
 import { graphql } from 'graphql';
 
-export interface User {
-  id: string,
-  name: string,
-  balance: number,
-  posts: [],
-  userSubscridebTo: []
-}
 
-export interface Profile {
-  id: string,
-  isMale: boolean,
-  yearOfBirth: 0,
-  userId:string,
-  memberTypeId: string
-}
+
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   fastify.route({
@@ -29,7 +16,12 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       },
     },
     async handler(req) {
-      return {};
+      const data = await graphql({
+        schema: schema,
+        source: req.body.query,
+        variableValues: req.body.variables,
+      });
+      return data;
     },
   });
 };

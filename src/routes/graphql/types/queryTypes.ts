@@ -38,3 +38,31 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
     }
   })
 });
+
+
+export const RootQuery = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    users: {
+      type: GraphQLBoolean,
+      resolve: () => {
+        return true
+      }
+    }
+  }
+})
+export const RootMutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    createUser: {
+      type: UserType,
+      args: {
+        name: { type: GraphQLString },
+        balance: { type: GraphQLFloat },
+      },
+      resolve: async (_parent, _context) => {
+
+      }
+    }
+  }
+});
