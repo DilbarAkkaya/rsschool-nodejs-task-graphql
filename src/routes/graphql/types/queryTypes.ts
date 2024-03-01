@@ -2,6 +2,7 @@ import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLBoo
 import { IContext } from './context.js';
 import { ICreateUser, IUser } from './user.js';
 import { UUIDType } from './uuid.js';
+import { ICreatePost, IPOST } from './post.js';
 
 export const UserType: GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
@@ -39,13 +40,39 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
     }
   })
 });
+export const PostType: GraphQLObjectType = new GraphQLObjectType({
+  name: 'Post',
+  description: 'Post in DB',
+  fields: () => ({
+    id: { type: UUIDType },
+    title: { type: GraphQLString },
+    content: { type: GraphQLString },
+    authorId: { type: UUIDType },
+    author: {
+      type: UserType,
+      resolve: async (_, _args: IPOST, _context: IContext) => {
+        const db = _context.db;
+        return await db.user.findFirst({ where: { id: _args.authorId } })
+      }
+    },
 
+  })
+});
 export const createUserType: GraphQLInputObjectType = new GraphQLInputObjectType({
   name: 'CreateUserInput',
   fields: () => (
     {
-      name: {type: new GraphQLNonNull(GraphQLString)},
-        balance: {type: new GraphQLNonNull(GraphQLFloat)},
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      balance: { type: new GraphQLNonNull(GraphQLFloat) },
+    })
+})
+export const createPostType: GraphQLInputObjectType = new GraphQLInputObjectType({
+  name: 'CreatePostInput',
+  fields: () => (
+    {
+      authorId: { type: UUIDType },
+      title: { type: new GraphQLNonNull(GraphQLString) },
+      content: { type: new GraphQLNonNull(GraphQLString) }
     })
 })
 
@@ -54,7 +81,7 @@ export const RootQuery = new GraphQLObjectType({
   fields: {
     users: {
       type: new GraphQLList(UserType),
-      resolve: async (_context: IContext) => {
+      resolve: async (_, __, _context: IContext) => {
         const data = await _context.db.user.findMany();
         return data;
       }
@@ -68,7 +95,24 @@ export const RootQuery = new GraphQLObjectType({
         const db = _context.db;
         return await db.user.findFirst({ where: { id: _args.id } })
       }
-    }
+    },
+    post: {
+      type: PostType,
+      args: {
+        id: { type: UUIDType }
+      },
+      resolve: async (_parent, _args: IPOST, _context: IContext) => {
+        const db = _context.db;
+        return await db.post.findFirst({ where: { id: _args.id } })
+      }
+    },
+    posts: {
+      type: new GraphQLList(PostType),
+      resolve: async (_, __, _context: IContext) => {
+        const data = await _context.db.post.findMany();
+        return data;
+      }
+    },
   }
 })
 
@@ -90,6 +134,25 @@ export const RootMutation = new GraphQLObjectType({
           },
         });
         return newUser;
+      },
+    },
+    createPost: {
+      type: PostType,
+      args: {
+        authorId: { type: UUIDType },
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        content: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (_parent, _args: ICreatePost, _context: IContext) => {
+        const db = _context.db;
+        const newPost: ICreatePost = await db.post.create({
+          data: {
+            authorId: _args.authorId,
+            title: _args.title,
+            content: _args.content,
+          },
+        });
+        return newPost;
       },
     },
   },
