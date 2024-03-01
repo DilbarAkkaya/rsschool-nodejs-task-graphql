@@ -1,6 +1,6 @@
-import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLBoolean, GraphQLInt } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLBoolean, GraphQLInt, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
 import { IContext } from './context.js';
-import { IUser } from './user.js';
+import { ICreateUser, IUser } from './user.js';
 import { UUIDType } from './uuid.js';
 
 export const UserType: GraphQLObjectType = new GraphQLObjectType({
@@ -40,6 +40,14 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
   })
 });
 
+export const createUserType: GraphQLInputObjectType = new GraphQLInputObjectType({
+  name: 'CreateUserInput',
+  fields: () => (
+    {
+      name: {type: new GraphQLNonNull(GraphQLString)},
+        balance: {type: new GraphQLNonNull(GraphQLFloat)},
+    })
+})
 
 export const RootQuery = new GraphQLObjectType({
   name: 'Query',
@@ -61,8 +69,9 @@ export const RootQuery = new GraphQLObjectType({
         return await db.user.findFirst({ where: { id: _args.id } })
       }
     }
-  }})
-  
+  }
+})
+
 export const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
@@ -72,9 +81,16 @@ export const RootMutation = new GraphQLObjectType({
         name: { type: GraphQLString },
         balance: { type: GraphQLFloat },
       },
-      resolve: async (_parent, _context) => {
-
-      }
-    }
-  }
+      resolve: async (_parent, _args: ICreateUser, _context: IContext) => {
+        const db = _context.db;
+        const newUser: ICreateUser = await db.user.create({
+          data: {
+            name: _args.name,
+            balance: _args.balance,
+          },
+        });
+        return newUser;
+      },
+    },
+  },
 });

@@ -1,6 +1,6 @@
 import { IProfile } from "./profile.js";
 export interface IUser {
-  id: string,
+  id?: string,
   name: string,
   balance: number,
   profile: IProfile,
@@ -10,4 +10,9 @@ export interface IUser {
   SubscribedToUser: {
     authotId: string,
   }[],
+}
+
+export interface ICreateUser {
+  name: string,
+  balance: number,
 }
