@@ -5,7 +5,10 @@ export interface IPOST {
   authorId: string,
 }
 export interface ICreatePost {
-  authorId: string,
-  title: string,
-  content: string,
+  postData: {
+    authorId: string,
+    title: string,
+    content: string,
+  }
+
 }

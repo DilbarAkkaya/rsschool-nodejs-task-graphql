@@ -13,15 +13,37 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
     balance: { type: GraphQLFloat },
     profile: {
       type: ProfileType,
-      resolve: async (_parent: IUser, _args, _context: IContext) => {
+      resolve: async (_parent: IUser, _, _context: IContext) => {
         const db = _context.db;
         return await db.profile.findFirst({ where: { id: _parent.id } })
       }
     },
-    UserSubscribedTo: { type: new GraphQLList(GraphQLString) },
-    SubscribedToUser: { type: new GraphQLList(GraphQLString) }
+    posts: {
+      type: new GraphQLList(PostType),
+      resolve: async (_parent: IUser, _, _context: IContext) => {
+        const db = _context.db;
+        return await db.profile.findFirst({ where: { id: _parent.id } })
+      }
+    },
+    UserSubscribedTo: { 
+      type: new GraphQLList(UserType),
+    resolve: async (_parent, _, _context: IContext)=> {
+       const userSubArray = await _context.db.subscribersOnAuthors.findMany({where: {subscriberId: _parent.id}});
+       return userSubArray.map((item)=> item.authorId)
+    }
+  },
+    SubscribedToUser: { 
+      type: new GraphQLList(UserType),
+      resolve: async (_parent, _, _context: IContext) => {
+        const results = await _context.db.subscribersOnAuthors.findMany({
+          where: { authorId: _parent.id },
+        });
+        return results.map((result) => result.subscriberId);
+      }
+    },
   })
-});
+})
+
 export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
   name: 'Profile',
   description: 'User profile',
@@ -121,37 +143,21 @@ export const RootMutation = new GraphQLObjectType({
   fields: {
     createUser: {
       type: UserType,
-      args: {
-        name: { type: GraphQLString },
-        balance: { type: GraphQLFloat },
-      },
+      args: { userData: { type: new GraphQLNonNull(createUserType) } },
       resolve: async (_parent, _args: ICreateUser, _context: IContext) => {
         const db = _context.db;
-        const newUser: ICreateUser = await db.user.create({
-          data: {
-            name: _args.name,
-            balance: _args.balance,
-          },
-        });
+        const newUser = await db.user.create({data: _args.userData});
         return newUser;
       },
     },
     createPost: {
       type: PostType,
       args: {
-        authorId: { type: UUIDType },
-        title: { type: new GraphQLNonNull(GraphQLString) },
-        content: { type: new GraphQLNonNull(GraphQLString) }
+        postData: {type: new GraphQLNonNull(createPostType)},
       },
       resolve: async (_parent, _args: ICreatePost, _context: IContext) => {
         const db = _context.db;
-        const newPost: ICreatePost = await db.post.create({
-          data: {
-            authorId: _args.authorId,
-            title: _args.title,
-            content: _args.content,
-          },
-        });
+        const newPost = await db.post.create({data: _args.postData});
         return newPost;
       },
     },

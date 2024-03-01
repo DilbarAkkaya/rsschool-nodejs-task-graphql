@@ -4,15 +4,20 @@ export interface IUser {
   name: string,
   balance: number,
   profile: IProfile,
-  UserSubscribedTo: {
+  UserSubscribedTo?: {
+    suscriberId: string,
     authotId: string,
   }[],
-  SubscribedToUser: {
+  SubscribedToUser?: {
+    suscriberId: string,
     authotId: string,
   }[],
 }
 
 export interface ICreateUser {
-  name: string,
-  balance: number,
+  userData: {
+    name: string,
+    balance: number,
+  }
+
 }
