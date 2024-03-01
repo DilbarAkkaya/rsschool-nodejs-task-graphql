@@ -1,12 +1,13 @@
 import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLBoolean, GraphQLInt } from 'graphql';
 import { IContext } from './context.js';
 import { IUser } from './user.js';
+import { UUIDType } from './uuid.js';
 
 export const UserType:GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
   description: 'User in DB',
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: UUIDType },
     name: { type: GraphQLString },
     balance: { type: GraphQLFloat },
     profile: {
@@ -24,10 +25,10 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
   name: 'Profile',
   description: 'User profile',
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: UUIDType },
     isMale: { type: GraphQLBoolean },
     yearOfBirth: { type: GraphQLInt },
-    userId: { type: GraphQLString },
+    userId: { type: UUIDType },
     memberTypeId: { type: GraphQLString },
     user: {
       type: UserType,
