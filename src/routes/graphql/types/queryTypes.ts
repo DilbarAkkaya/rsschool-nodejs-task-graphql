@@ -45,9 +45,10 @@ export const RootQuery = new GraphQLObjectType({
   name: 'Query',
   fields: {
     users: {
-      type: GraphQLBoolean,
-      resolve: () => {
-        return true
+      type: new GraphQLList(UserType),
+      resolve: async (_context: IContext) => {
+        const data = await _context.db.user.findMany();
+        return data;
       }
     }
   }
