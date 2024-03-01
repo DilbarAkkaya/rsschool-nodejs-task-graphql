@@ -3,7 +3,7 @@ import { IContext } from './context.js';
 import { IUser } from './user.js';
 import { UUIDType } from './uuid.js';
 
-export const UserType:GraphQLObjectType = new GraphQLObjectType({
+export const UserType: GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
   description: 'User in DB',
   fields: () => ({
@@ -11,12 +11,12 @@ export const UserType:GraphQLObjectType = new GraphQLObjectType({
     name: { type: GraphQLString },
     balance: { type: GraphQLFloat },
     profile: {
-       type: ProfileType,
-       resolve: async (_parent: IUser, _args, _context: IContext)=> {
+      type: ProfileType,
+      resolve: async (_parent: IUser, _args, _context: IContext) => {
         const db = _context.db;
-        return await db.profile.findFirst({where: {id: _parent.id} })
+        return await db.profile.findFirst({ where: { id: _parent.id } })
       }
-     },
+    },
     UserSubscribedTo: { type: new GraphQLList(GraphQLString) },
     SubscribedToUser: { type: new GraphQLList(GraphQLString) }
   })
@@ -32,9 +32,9 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
     memberTypeId: { type: GraphQLString },
     user: {
       type: UserType,
-      resolve: async (_parent: IUser, _args, _context: IContext)=> {
+      resolve: async (_parent: IUser, _args, _context: IContext) => {
         const db = _context.db;
-        return await db.user.findFirst({where: {id: _parent.id} })
+        return await db.user.findFirst({ where: { id: _parent.id } })
       }
     }
   })
@@ -50,9 +50,19 @@ export const RootQuery = new GraphQLObjectType({
         const data = await _context.db.user.findMany();
         return data;
       }
+    },
+    user: {
+      type: UserType,
+      args: {
+        id: { type: UUIDType }
+      },
+      resolve: async (_, _args: IUser, _context: IContext) => {
+        const db = _context.db;
+        return await db.user.findFirst({ where: { id: _args.id } })
+      }
     }
-  }
-})
+  }})
+  
 export const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
