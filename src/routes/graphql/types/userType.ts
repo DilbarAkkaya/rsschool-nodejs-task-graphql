@@ -23,7 +23,7 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
       type: new GraphQLList(PostType),
       resolve: async (_parent: IUser, _, _context: IContext) => {
         const db = _context.db;
-        return await db.profile.findFirst({ where: { id: _parent.id } })
+        return await db.post.findFirst({ where: { authorId: _parent.id } })
       }
     },
     UserSubscribedTo: { 
@@ -58,7 +58,7 @@ export const createPostType: GraphQLInputObjectType = new GraphQLInputObjectType
   name: 'CreatePostInput',
   fields: () => (
     {
-      authorId: { type: UUIDType },
+      authorId: { type: new GraphQLNonNull(UUIDType) },
       title: { type: new GraphQLNonNull(GraphQLString) },
       content: { type: new GraphQLNonNull(GraphQLString) }
     })

@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLString } from 'graphql';
 import { IContext } from './context.js';
 import { UUIDType } from './uuid.js';
 import { IPOST } from './post.js';
-import { UserType } from './queryTypes.js';
+import { UserType } from './userType.js';
 export const PostType: GraphQLObjectType = new GraphQLObjectType({
   name: 'Post',
   description: 'Post in DB',

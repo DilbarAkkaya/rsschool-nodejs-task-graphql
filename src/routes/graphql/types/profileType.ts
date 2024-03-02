@@ -2,7 +2,7 @@ import { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLInt } from 'gr
 import { IContext } from './context.js';
 import { IUser } from './user.js';
 import { UUIDType } from './uuid.js';
-import { UserType } from './queryTypes.js';
+import { UserType } from './userType.js';
 export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
   name: 'Profile',
   description: 'User profile',
@@ -15,8 +15,7 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
     user: {
       type: UserType,
       resolve: async (_parent: IUser, _args, _context: IContext) => {
-        const db = _context.db;
-        return await db.user.findFirst({ where: { id: _parent.id } })
+        await _context.db.profile.findFirst({ where: { userId: _parent.id } })
       }
     }
   })
