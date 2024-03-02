@@ -17,8 +17,7 @@ export const RootQuery = new GraphQLObjectType({
     users: {
       type: new GraphQLList(UserType),
       resolve: async (_, __, _context: IContext) => {
-        await _context.db.user.findMany();
-
+       return await _context.db.user.findMany();
       }
     },
     user: {
@@ -27,6 +26,9 @@ export const RootQuery = new GraphQLObjectType({
         id: { type: UUIDType }
       },
       resolve: async (_, _args: IUser, _context: IContext) => {
+        if (!_args || !_args.id) {
+          throw new Error('User ID is required');
+        }
         const db = _context.db;
         return await db.user.findFirst({ where: { id: _args.id } })
       }
@@ -37,6 +39,9 @@ export const RootQuery = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(UUIDType) }
       },
       resolve: async (_parent, _args: IPOST, _context: IContext) => {
+        if (!_args || !_args.id) {
+          throw new Error('Post ID is required');
+        }
         const db = _context.db;
         return await db.post.findFirst({ where: { id: _args.id} })
       }
@@ -51,16 +56,21 @@ export const RootQuery = new GraphQLObjectType({
     profile: {
       type: ProfileType,
       args: { id: { type: UUIDType } },
-      resolve: async (_parent, _arg: IProfile, _context: IContext) =>{
-       const result = await _context.db.profile.findFirst({ where: { id: _arg.id } });
+      resolve: async (_parent, _args: IProfile, _context: IContext) =>{
+        if (!_args || !_args.id) {
+          throw new Error('Profile ID is required');
+        }
+       const result = await _context.db.profile.findFirst({ where: { id: _args.id } });
        return result;
       }
     },
 
     profiles: {
       type: new GraphQLList(ProfileType),
-      resolve: async (_, __, _context: IContext) =>
-        await _context.db.profile.findMany({}),
+      resolve: async (_, __, _context: IContext) =>{
+      const data = await _context.db.profile.findMany({})
+      return data;
+      }
     },
 
     memberType: {
@@ -68,13 +78,17 @@ export const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(enumMemberId) },
       },
-      resolve: async (_parent, _args: IMemberType, _context: IContext) =>
-        await _context.db.memberType.findFirst({ where: { id: _args.id } }),
+      resolve: async (_parent, _args: IMemberType, _context: IContext) =>{
+        const data = await _context.db.memberType.findFirst({ where: { id: _args.id } })
+        return data;
+      }
     },
 
     memberTypes: {
       type: new GraphQLList(MemberType),
-      resolve: async (_parent, _arg, _context) => await _context.db.memberType.findMany(),
+      resolve: async (_parent, _args, _context) => {
+        return await _context.db.memberType.findMany()
+      }
     },
   })
 })

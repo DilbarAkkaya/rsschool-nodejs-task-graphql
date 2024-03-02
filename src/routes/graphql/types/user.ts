@@ -5,12 +5,12 @@ export interface IUser {
   balance: number,
   profile: IProfile,
   UserSubscribedTo?: {
-    suscriberId: string,
-    authotId: string,
+    subscriberId: string,
+    authorId: string,
   }[],
   SubscribedToUser?: {
     suscriberId: string,
-    authotId: string,
+    authorId: string,
   }[],
 }
 
@@ -19,5 +19,9 @@ export interface ICreateUser {
     name: string,
     balance: number,
   }
+}
 
+export interface UserSubscribedTo {
+    subscriberId: string,
+    authorId: string,
 }

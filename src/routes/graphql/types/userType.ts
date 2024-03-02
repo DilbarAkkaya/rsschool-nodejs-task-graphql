@@ -54,13 +54,4 @@ export const createUserType: GraphQLInputObjectType = new GraphQLInputObjectType
       balance: { type: new GraphQLNonNull(GraphQLFloat) },
     })
 })
-export const createPostType: GraphQLInputObjectType = new GraphQLInputObjectType({
-  name: 'CreatePostInput',
-  fields: () => (
-    {
-      authorId: { type: new GraphQLNonNull(UUIDType) },
-      title: { type: new GraphQLNonNull(GraphQLString) },
-      content: { type: new GraphQLNonNull(GraphQLString) }
-    })
-})
 
