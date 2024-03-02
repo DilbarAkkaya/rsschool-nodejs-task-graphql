@@ -20,6 +20,13 @@ export interface ICreateUser {
     balance: number,
   }
 }
+export interface IChangeUser {
+  id: string,
+  userData: {
+    name: string,
+    balance: number,
+  }
+}
 
 export interface UserSubscribedTo {
     subscriberId: string,

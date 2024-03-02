@@ -12,3 +12,12 @@ export interface ICreatePost {
   }
 
 }
+export interface IChangePost {
+  id: string,
+  postData: {
+    authorId: string,
+    title: string,
+    content: string,
+  }
+
+}

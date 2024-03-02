@@ -3,8 +3,9 @@ import { IContext } from './context.js';;
 import { ProfileType } from './profileType.js';
 import { IMemberType } from './memberType.js';
 
+
 export const enumMemberId = new GraphQLEnumType({
-  name: 'MemberTypeIdTypes',
+  name: 'MemberTypeId',
   values: {
     basic: {value: 'basic',},
     business: {value: 'business',},
@@ -19,8 +20,13 @@ export const MemberType: GraphQLObjectType = new GraphQLObjectType({
     postsLimitPerMonth: { type: GraphQLInt },
     profiles: {
       type: new GraphQLList(ProfileType),
-      resolve: async (_, _args: IMemberType, _context: IContext) => {
-        await _context.db.profile.findMany({ where: { memberTypeId: _args.id } });
+      resolve: async (_parent: IMemberType, _, _context: IContext) => {
+        try {
+          return await _context.db.profile.findMany({ where: { memberTypeId: _parent.id } });
+        } catch {
+          return null;
+        }
+        
       },
     },
   })

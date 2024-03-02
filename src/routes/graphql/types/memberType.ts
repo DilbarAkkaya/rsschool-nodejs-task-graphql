@@ -3,3 +3,5 @@ export interface IMemberType {
   discount: number,
   postsLimitPerMonth: number,
 }
+
+   

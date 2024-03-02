@@ -14,3 +14,11 @@ export interface ICreateProfile {
     memberTypeId: string
   }
 }
+export interface IChangeProfile {
+  id: string,
+  profileData:{
+    isMale: boolean,
+    yearOfBirth: 0,
+    memberTypeId: string
+  }
+}

@@ -1,15 +1,15 @@
 
 import { GraphQLBoolean, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { IContext } from '../graphql/types/context.js';
-import { PostType } from '../graphql/types/postType.js';
-import { UserType } from './types/userType.js';
-import { ICreateUser, UserSubscribedTo } from './types/user.js';
-import { ICreatePost, IPOST } from './types/post.js';
+import { ChangePostType, PostType } from '../graphql/types/postType.js';
+import { UserType, changeUserType } from './types/userType.js';
+import { IChangeUser, ICreateUser, IUser, UserSubscribedTo } from './types/user.js';
+import { IChangePost, ICreatePost, IPOST } from './types/post.js';
 import { createUserType } from './types/userType.js';
 import { createPostType } from '../graphql/types/postType.js';
 import { UUIDType } from './types/uuid.js';
-import { ProfileType, createProfileType } from './types/profileType.js';
-import { ICreateProfile } from './types/profile.js';
+import { ProfileType, createProfileType, changeProfileType } from './types/profileType.js';
+import { IChangeProfile, ICreateProfile } from './types/profile.js';
 
 export const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
@@ -23,6 +23,27 @@ export const RootMutation = new GraphQLObjectType({
         return newUser;
       },
     },
+
+    changeUser: {
+      type: UserType,
+      args: { id: { type: UUIDType }, userData: { type: changeUserType } },
+      resolve: async (_parent,_args: IChangeUser, _context:IContext) =>
+        await _context.db.user.update({ where: { id: _args.id }, data: _args.userData }),
+    },
+
+    deleteUser: {
+      type: GraphQLBoolean,
+      args: { id: { type: UUIDType } },
+      resolve: async (_parent, _args: IUser,_context:IContext) => {
+        try {
+          await _context.db.user.delete({ where: { id: _args.id } });
+        } catch (err) {
+          return false;
+        }
+        return true;
+      },
+    },
+
     createPost: {
       type: PostType,
       args: {
@@ -34,17 +55,17 @@ export const RootMutation = new GraphQLObjectType({
         return newPost;
       },
     },
+
     changePost: {
       type: PostType,
-      args: {
-        postData: { type: createPostType },
-      },
-      resolve: async (_parent, _args: ICreatePost, _context: IContext) => {
+      args: { id: { type: UUIDType }, postData: {type: ChangePostType }},
+      resolve: async (_, _args: IChangePost, _context: IContext) => {
         const db = _context.db;
-        const newPost = await db.post.create({ data: _args.postData });
+        const newPost = await db.post.update({where: {id: _args.id}, data: _args.postData });
         return newPost;
       },
     },
+
     deletePost: {
       type: GraphQLBoolean,
       args: {
@@ -61,6 +82,7 @@ export const RootMutation = new GraphQLObjectType({
         return true
       },
     },
+
     createProfile: {
       type: ProfileType,
       args: { profileData: { type: createProfileType } },
@@ -70,6 +92,17 @@ export const RootMutation = new GraphQLObjectType({
         return newProfile;
       },
     },
+
+    changeProfile: {
+      type: ProfileType,
+      args: { id: { type: UUIDType }, profileData: {type: changeProfileType }},
+      resolve: async (_parent, _args: IChangeProfile, _context: IContext) => {
+        const db = _context.db;
+        const newProfile = await db.profile.update({where: {id: _args.id}, data: _args.profileData });
+        return newProfile;
+      },
+    },
+
     subscribeTo: {
       type: UserType,
       args: { subscriberId: { type: UUIDType }, authorId: { type: UUIDType } },
@@ -77,7 +110,6 @@ export const RootMutation = new GraphQLObjectType({
         await _context.db.subscribersOnAuthors.create({
           data: { subscriberId: _args.subscriberId, authorId: _args.authorId },
         });
-
         return await _context.db.user.findFirst({ where: { id: _args.subscriberId } });
       },
     },

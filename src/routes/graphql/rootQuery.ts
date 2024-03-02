@@ -55,9 +55,6 @@ export const RootQuery = new GraphQLObjectType({
       type: ProfileType,
       args: { id: { type: new GraphQLNonNull(UUIDType) } },
       resolve: async (_, _args: IProfile, _context: IContext) =>{
-        if (!_args || !_args.id) {
-          throw new Error('Profile ID is required');
-        }
        const result = await _context.db.profile.findFirst({ where: { id: _args.id } });
        return result;
       }

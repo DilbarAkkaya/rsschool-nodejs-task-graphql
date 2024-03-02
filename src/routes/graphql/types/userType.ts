@@ -24,7 +24,7 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
       type: new GraphQLList(PostType),
       resolve: async (_parent: IUser, _, _context: IContext) => {
         const db = _context.db;
-        return await db.post.findFirst({ where: { authorId: _parent.id } })
+        return await db.post.findMany({ where: { authorId: _parent.id } })
       }
     },
     UserSubscribedTo: { 
@@ -56,3 +56,11 @@ export const createUserType: GraphQLInputObjectType = new GraphQLInputObjectType
     })
 })
 
+export const changeUserType: GraphQLInputObjectType = new GraphQLInputObjectType({
+  name: 'ChangeUserInput',
+  fields: () => (
+    {
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      balance: { type: new GraphQLNonNull(GraphQLFloat) },
+    })
+})
