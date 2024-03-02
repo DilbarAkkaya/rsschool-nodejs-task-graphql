@@ -1,15 +1,15 @@
-import { IProfile } from "./profile.js";
+//import { IProfile } from "./profile.js";
 export interface IUser {
   id?: string,
   name: string,
   balance: number,
-  profile: IProfile,
+ // profile: IProfile,
   UserSubscribedTo?: {
     subscriberId: string,
     authorId: string,
   }[],
   SubscribedToUser?: {
-    suscriberId: string,
+    subscriberId: string,
     authorId: string,
   }[],
 }

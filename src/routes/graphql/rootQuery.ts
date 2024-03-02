@@ -23,12 +23,10 @@ export const RootQuery = new GraphQLObjectType({
     user: {
       type: UserType,
       args: {
-        id: { type: UUIDType }
+        id: { type: new GraphQLNonNull(UUIDType) }
       },
       resolve: async (_, _args: IUser, _context: IContext) => {
-        if (!_args || !_args.id) {
-          throw new Error('User ID is required');
-        }
+  
         const db = _context.db;
         return await db.user.findFirst({ where: { id: _args.id } })
       }
@@ -38,7 +36,7 @@ export const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(UUIDType) }
       },
-      resolve: async (_parent, _args: IPOST, _context: IContext) => {
+      resolve: async (_, _args: IPOST, _context: IContext) => {
         if (!_args || !_args.id) {
           throw new Error('Post ID is required');
         }
@@ -55,8 +53,8 @@ export const RootQuery = new GraphQLObjectType({
     },
     profile: {
       type: ProfileType,
-      args: { id: { type: UUIDType } },
-      resolve: async (_parent, _args: IProfile, _context: IContext) =>{
+      args: { id: { type: new GraphQLNonNull(UUIDType) } },
+      resolve: async (_, _args: IProfile, _context: IContext) =>{
         if (!_args || !_args.id) {
           throw new Error('Profile ID is required');
         }
@@ -78,7 +76,7 @@ export const RootQuery = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(enumMemberId) },
       },
-      resolve: async (_parent, _args: IMemberType, _context: IContext) =>{
+      resolve: async (_, _args: IMemberType, _context: IContext) =>{
         const data = await _context.db.memberType.findFirst({ where: { id: _args.id } })
         return data;
       }
@@ -86,7 +84,7 @@ export const RootQuery = new GraphQLObjectType({
 
     memberTypes: {
       type: new GraphQLList(MemberType),
-      resolve: async (_parent, _args, _context) => {
+      resolve: async (_, __, _context) => {
         return await _context.db.memberType.findMany()
       }
     },
