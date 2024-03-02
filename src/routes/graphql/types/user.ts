@@ -4,11 +4,11 @@ export interface IUser {
   name: string,
   balance: number,
  // profile: IProfile,
-  UserSubscribedTo?: {
+  userSubscribedTo?: {
     subscriberId: string,
     authorId: string,
   }[],
-  SubscribedToUser?: {
+  subscribedToUser?: {
     subscriberId: string,
     authorId: string,
   }[],
@@ -28,7 +28,11 @@ export interface IChangeUser {
   }
 }
 
-export interface UserSubscribedTo {
+export interface userSubscribedTo {
+    subscriberId: string,
+    authorId: string,
+}
+export interface subscribedToUser {
     subscriberId: string,
     authorId: string,
 }

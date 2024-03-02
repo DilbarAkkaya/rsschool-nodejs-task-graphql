@@ -4,10 +4,10 @@ import { IUser } from './user.js';
 import { UUIDType } from './uuid.js';
 import { PostType } from './postType.js';
 import { ProfileType } from './profileType.js';
-import { IProfile } from './profile.js';
+//import { IProfile } from './profile.js';
 
 export const UserType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'User',
+  name: 'UserType',
   description: 'User in DB',
   fields: () => ({
     id: { type: UUIDType },
@@ -15,9 +15,9 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
     balance: { type: GraphQLFloat },
     profile: {
       type: ProfileType,
-      resolve: async (_, _args:IProfile, _context: IContext) => {
+      resolve: async (_parent: IUser, _, _context: IContext) => {
         const db = _context.db;
-        return await db.profile.findFirst({ where: { id: _args.userId } })
+        return await db.profile.findFirst({ where: { userId: _parent.id } })
       }
     },
     posts: {
@@ -27,20 +27,22 @@ export const UserType: GraphQLObjectType = new GraphQLObjectType({
         return await db.post.findMany({ where: { authorId: _parent.id } })
       }
     },
-    UserSubscribedTo: { 
-      type: new GraphQLList(UserType),
-    resolve: async (_parent: IUser, _, _context: IContext)=> {
-       const userSubArray = await _context.db.subscribersOnAuthors.findMany({where: {subscriberId: _parent.id}});
-       return userSubArray.map((item)=> item.authorId)
-    }
-  },
-    SubscribedToUser: { 
+    userSubscribedTo: {
       type: new GraphQLList(UserType),
       resolve: async (_parent: IUser, _, _context: IContext) => {
-        const results = await _context.db.subscribersOnAuthors.findMany({
+        const userSubscribedUsers = await _context.db.subscribersOnAuthors.findMany({
+          where: { subscriberId: _parent.id }, include: { author: true } });
+        return userSubscribedUsers.map((item) => item.author)
+      }
+    },
+    subscribedToUser: {
+      type: new GraphQLList(UserType),
+      resolve: async (_parent: IUser, _, _context: IContext) => {
+        const thisUserSuscribers = await _context.db.subscribersOnAuthors.findMany({
           where: { authorId: _parent.id },
+          include: { subscriber: true }
         });
-        return results.map((result) => result.subscriberId);
+        return thisUserSuscribers.map((item) => item.subscriber);
       }
     },
   })

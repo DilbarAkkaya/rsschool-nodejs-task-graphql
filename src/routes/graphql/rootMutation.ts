@@ -3,7 +3,7 @@ import { GraphQLBoolean, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { IContext } from '../graphql/types/context.js';
 import { ChangePostType, PostType } from '../graphql/types/postType.js';
 import { UserType, changeUserType } from './types/userType.js';
-import { IChangeUser, ICreateUser, IUser, UserSubscribedTo } from './types/user.js';
+import { IChangeUser, ICreateUser, IUser, userSubscribedTo } from './types/user.js';
 import { IChangePost, ICreatePost, IPOST } from './types/post.js';
 import { createUserType } from './types/userType.js';
 import { createPostType } from '../graphql/types/postType.js';
@@ -106,7 +106,7 @@ export const RootMutation = new GraphQLObjectType({
     subscribeTo: {
       type: UserType,
       args: { subscriberId: { type: UUIDType }, authorId: { type: UUIDType } },
-      resolve: async (_parent, _args: UserSubscribedTo, _context:IContext) => {
+      resolve: async (_parent, _args: userSubscribedTo, _context:IContext) => {
         await _context.db.subscribersOnAuthors.create({
           data: { subscriberId: _args.subscriberId, authorId: _args.authorId },
         });
