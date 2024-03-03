@@ -29,10 +29,10 @@ export interface IChangeUser {
 }
 
 export interface userSubscribedTo {
-    subscriberId: string,
+    userId: string,
     authorId: string,
 }
 export interface subscribedToUser {
-    subscriberId: string,
+    userId: string,
     authorId: string,
 }

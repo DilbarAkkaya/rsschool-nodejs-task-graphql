@@ -13,13 +13,12 @@ import { IChangeProfile, ICreateProfile, IProfile } from './types/profile.js';
 
 export const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
-  fields: {
+  fields: ()=> ({
     createUser: {
       type: UserType,
       args: { userData: { type: createUserType } },
-      resolve: async (_parent, _args: ICreateUser, _context: IContext) => {
-        const db = _context.db;
-        const newUser = await db.user.create({ data: _args.userData });
+      resolve: async (_, _args: ICreateUser, _context: IContext) => {
+        const newUser = await _context.db.user.create({ data: _args.userData });
         return newUser;
       },
     },
@@ -50,7 +49,7 @@ export const RootMutation = new GraphQLObjectType({
       args: {
         postData: { type: createPostType },
       },
-      resolve: async (_, _args: ICreatePost, _context: IContext) => {
+      resolve: async (_parent, _args: ICreatePost, _context: IContext) => {
         const db = _context.db;
         const newPost = await db.post.create({ data: _args.postData });
         return newPost;
@@ -122,21 +121,21 @@ export const RootMutation = new GraphQLObjectType({
 
     subscribeTo: {
       type: UserType,
-      args: { subscriberId: { type: UUIDType }, authorId: { type: UUIDType } },
+      args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
       resolve: async (_parent, _args: userSubscribedTo, _context: IContext) => {
         await _context.db.subscribersOnAuthors.create({
-          data: { subscriberId: _args.subscriberId, authorId: _args.authorId },
+          data: { subscriberId: _args.userId, authorId: _args.authorId },
         });
-        return await _context.db.user.findFirst({ where: { id: _args.subscriberId } });
+        return await _context.db.user.findFirst({ where: { id: _args.userId } });
       },
     },
   unsubscribeFrom: {
     type: GraphQLBoolean,
-    args: { subscriberId: { type: UUIDType }, authorId: { type: UUIDType } },
+    args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
     resolve: async (_parent, _args: userSubscribedTo, _context: IContext) => {
       try {
         await _context.db.subscribersOnAuthors.deleteMany({
-          where:{ subscriberId: _args.subscriberId, authorId: _args.authorId },
+          where:{ subscriberId: _args.userId, authorId: _args.authorId },
         });
       } catch (err) {
         return false;
@@ -144,5 +143,5 @@ export const RootMutation = new GraphQLObjectType({
       return true;
     },
   },
-}
+})
 });

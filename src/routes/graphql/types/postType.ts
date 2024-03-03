@@ -13,9 +13,9 @@ export const PostType: GraphQLObjectType = new GraphQLObjectType({
     authorId: { type: UUIDType },
     author: {
       type: UserType,
-      resolve: async (_, _args: IPOST, _context: IContext) => {
+      resolve: async ({authorId}: IPOST, _context: IContext) => {
         const db = _context.db;
-        return await db.user.findFirst({ where: { id: _args.authorId } })
+        return await db.user.findFirst({ where: { id: authorId } })
       }
     },
 
@@ -23,7 +23,7 @@ export const PostType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 export const createPostType: GraphQLInputObjectType = new GraphQLInputObjectType({
-  name: 'CreatePostInputType',
+  name: 'CreatePostInput',
   fields: () => (
     {
       authorId: { type: new GraphQLNonNull(UUIDType) },
