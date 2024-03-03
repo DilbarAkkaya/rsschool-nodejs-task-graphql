@@ -62,7 +62,7 @@ export const changeUserType: GraphQLInputObjectType = new GraphQLInputObjectType
   name: 'ChangeUserInput',
   fields: () => (
     {
-      name: { type: new GraphQLNonNull(GraphQLString) },
-      balance: { type: new GraphQLNonNull(GraphQLFloat) },
+      name: { type: GraphQLString },
+      balance: { type: GraphQLFloat },
     })
 })

@@ -5,7 +5,7 @@ export interface IPOST {
   authorId: string,
 }
 export interface ICreatePost {
-  postData: {
+ dto: {
     authorId: string,
     title: string,
     content: string,
@@ -14,7 +14,7 @@ export interface ICreatePost {
 }
 export interface IChangePost {
   id: string,
-  postData: {
+  dto: {
     authorId: string,
     title: string,
     content: string,

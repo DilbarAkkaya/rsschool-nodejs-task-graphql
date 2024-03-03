@@ -16,18 +16,18 @@ export const RootMutation = new GraphQLObjectType({
   fields: ()=> ({
     createUser: {
       type: UserType,
-      args: { userData: { type: createUserType } },
+      args: { dto: { type: createUserType } },
       resolve: async (_, _args: ICreateUser, _context: IContext) => {
-        const newUser = await _context.db.user.create({ data: _args.userData });
+        const newUser = await _context.db.user.create({ data: _args.dto });
         return newUser;
       },
     },
 
     changeUser: {
       type: UserType,
-      args: { id: { type: UUIDType }, userData: { type: changeUserType } },
+      args: { id: { type: UUIDType }, dto: { type: changeUserType } },
       resolve: async (_parent, _args: IChangeUser, _context: IContext) =>{
-       return await _context.db.user.update({ where: { id: _args.id }, data: _args.userData })
+       return await _context.db.user.update({ where: { id: _args.id }, data: _args.dto })
       }
       },
 
@@ -47,21 +47,21 @@ export const RootMutation = new GraphQLObjectType({
     createPost: {
       type: PostType,
       args: {
-        postData: { type: createPostType },
+        dto: { type: createPostType },
       },
       resolve: async (_parent, _args: ICreatePost, _context: IContext) => {
         const db = _context.db;
-        const newPost = await db.post.create({ data: _args.postData });
+        const newPost = await db.post.create({ data: _args.dto });
         return newPost;
       },
     },
 
     changePost: {
       type: PostType,
-      args: { id: { type: UUIDType }, postData: { type: ChangePostType } },
+      args: { id: { type: UUIDType }, dto: { type: ChangePostType } },
       resolve: async (_, _args: IChangePost, _context: IContext) => {
         const db = _context.db;
-        const newPost = await db.post.update({ where: { id: _args.id }, data: _args.postData });
+        const newPost = await db.post.update({ where: { id: _args.id }, data: _args.dto });
         return newPost;
       },
     },
@@ -85,20 +85,20 @@ export const RootMutation = new GraphQLObjectType({
 
     createProfile: {
       type: ProfileType,
-      args: { profileData: { type: createProfileType } },
+      args: { dto: { type: createProfileType } },
       resolve: async (_, _args: ICreateProfile, _context: IContext) => {
         const db = _context.db;
-        const newProfile = await db.profile.create({ data: _args.profileData });
+        const newProfile = await db.profile.create({ data: _args.dto });
         return newProfile;
       },
     },
 
     changeProfile: {
       type: ProfileType,
-      args: { id: { type: UUIDType }, profileData: { type: changeProfileType } },
+      args: { id: { type: UUIDType }, dto: { type: changeProfileType } },
       resolve: async (_, _args: IChangeProfile, _context: IContext) => {
         const db = _context.db;
-        const newProfile = await db.profile.update({ where: { id: _args.id }, data: _args.profileData });
+        const newProfile = await db.profile.update({ where: { id: _args.id }, data: _args.dto });
         return newProfile;
       },
     },

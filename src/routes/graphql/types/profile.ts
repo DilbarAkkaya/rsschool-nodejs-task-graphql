@@ -7,7 +7,7 @@ export interface IProfile {
   memberTypeId: string
 }
 export interface ICreateProfile {
-  profileData:{
+  dto:{
     isMale: boolean,
     yearOfBirth: 0,
     userId:string,
@@ -16,9 +16,9 @@ export interface ICreateProfile {
 }
 export interface IChangeProfile {
   id: string,
-  profileData:{
+  dto:{
     isMale: boolean,
     yearOfBirth: 0,
-    memberTypeId: string
+    memberTypeId: string,
   }
 }

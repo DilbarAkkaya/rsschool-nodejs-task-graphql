@@ -15,14 +15,14 @@ export interface IUser {
 }
 
 export interface ICreateUser {
-  userData: {
+  dto: {
     name: string,
     balance: number,
   }
 }
 export interface IChangeUser {
   id: string,
-  userData: {
+  dto: {
     name: string,
     balance: number,
   }

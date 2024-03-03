@@ -42,8 +42,8 @@ export const changeProfileType: GraphQLInputObjectType = new GraphQLInputObjectT
   name: 'ChangeProfileInput',
   fields: () => (
     {
-      isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
-      yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
-      memberTypeId: { type: new GraphQLNonNull(enumMemberId) }
+      isMale: { type: GraphQLBoolean },
+      yearOfBirth: { type: GraphQLInt },
+      memberTypeId: { type: enumMemberId}
     })
 })
