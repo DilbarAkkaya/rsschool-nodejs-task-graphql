@@ -20,9 +20,9 @@ export const MemberType: GraphQLObjectType = new GraphQLObjectType({
     postsLimitPerMonth: { type: GraphQLInt },
     profiles: {
       type: new GraphQLList(ProfileType),
-      resolve: async (_parent: IMemberType, _, _context: IContext) => {
+      resolve: async ({id}:IMemberType, _context: IContext) => {
         try {
-          return await _context.db.profile.findMany({ where: { memberTypeId: _parent.id } });
+          return await _context.db.profile.findMany({ where: { memberTypeId: id } });
         } catch {
           return null;
         }

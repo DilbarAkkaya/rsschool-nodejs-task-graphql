@@ -16,16 +16,16 @@ export const ProfileType: GraphQLObjectType = new GraphQLObjectType({
     memberTypeId: { type: enumMemberId },
     user: {
       type: UserType,
-      resolve: async (_parent:IProfile, _, _context: IContext) => {
-       return await _context.db.user.findFirst({ where: { id: _parent.userId} })
+      resolve: async (_parent: IProfile, _, _context: IContext) => {
+        return await _context.db.user.findFirst({ where: { id: _parent.userId } })
       }
     },
     memberType: {
       type: MemberType,
-      resolve: async ({memberTypeId}:IProfile, _, _context:IContext) =>{
-       return await _context.db.memberType.findFirst({ where: { id: memberTypeId } })
-    
-      }  },
+      resolve: async (_parent: IProfile, _, _context: IContext) => {
+        return await _context.db.memberType.findFirst({ where: { id: _parent.memberTypeId } })
+      }
+    },
   })
 });
 export const createProfileType: GraphQLInputObjectType = new GraphQLInputObjectType({
@@ -35,7 +35,7 @@ export const createProfileType: GraphQLInputObjectType = new GraphQLInputObjectT
       userId: { type: new GraphQLNonNull(UUIDType) },
       isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
       yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
-      memberTypeId: {type: new GraphQLNonNull(enumMemberId)}
+      memberTypeId: { type: new GraphQLNonNull(enumMemberId) }
     })
 })
 export const changeProfileType: GraphQLInputObjectType = new GraphQLInputObjectType({
@@ -44,6 +44,6 @@ export const changeProfileType: GraphQLInputObjectType = new GraphQLInputObjectT
     {
       isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
       yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
-      memberTypeId: {type: new GraphQLNonNull(enumMemberId)}
+      memberTypeId: { type: new GraphQLNonNull(enumMemberId) }
     })
 })

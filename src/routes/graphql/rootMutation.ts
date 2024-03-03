@@ -9,7 +9,7 @@ import { createUserType } from './types/userType.js';
 import { createPostType } from '../graphql/types/postType.js';
 import { UUIDType } from './types/uuid.js';
 import { ProfileType, createProfileType, changeProfileType } from './types/profileType.js';
-import { IChangeProfile, ICreateProfile } from './types/profile.js';
+import { IChangeProfile, ICreateProfile, IProfile } from './types/profile.js';
 
 export const RootMutation = new GraphQLObjectType({
   name: 'Mutation',
@@ -27,14 +27,15 @@ export const RootMutation = new GraphQLObjectType({
     changeUser: {
       type: UserType,
       args: { id: { type: UUIDType }, userData: { type: changeUserType } },
-      resolve: async (_parent,_args: IChangeUser, _context:IContext) =>
-        await _context.db.user.update({ where: { id: _args.id }, data: _args.userData }),
-    },
+      resolve: async (_parent, _args: IChangeUser, _context: IContext) =>{
+       return await _context.db.user.update({ where: { id: _args.id }, data: _args.userData })
+      }
+      },
 
     deleteUser: {
       type: GraphQLBoolean,
       args: { id: { type: UUIDType } },
-      resolve: async (_parent, _args: IUser,_context:IContext) => {
+      resolve: async (_parent, _args: IUser, _context: IContext) => {
         try {
           await _context.db.user.delete({ where: { id: _args.id } });
         } catch (err) {
@@ -49,7 +50,7 @@ export const RootMutation = new GraphQLObjectType({
       args: {
         postData: { type: createPostType },
       },
-      resolve: async (_parent, _args: ICreatePost, _context: IContext) => {
+      resolve: async (_, _args: ICreatePost, _context: IContext) => {
         const db = _context.db;
         const newPost = await db.post.create({ data: _args.postData });
         return newPost;
@@ -58,10 +59,10 @@ export const RootMutation = new GraphQLObjectType({
 
     changePost: {
       type: PostType,
-      args: { id: { type: UUIDType }, postData: {type: ChangePostType }},
+      args: { id: { type: UUIDType }, postData: { type: ChangePostType } },
       resolve: async (_, _args: IChangePost, _context: IContext) => {
         const db = _context.db;
-        const newPost = await db.post.update({where: {id: _args.id}, data: _args.postData });
+        const newPost = await db.post.update({ where: { id: _args.id }, data: _args.postData });
         return newPost;
       },
     },
@@ -86,7 +87,7 @@ export const RootMutation = new GraphQLObjectType({
     createProfile: {
       type: ProfileType,
       args: { profileData: { type: createProfileType } },
-      resolve: async (_parent, _args: ICreateProfile, _context: IContext) => {
+      resolve: async (_, _args: ICreateProfile, _context: IContext) => {
         const db = _context.db;
         const newProfile = await db.profile.create({ data: _args.profileData });
         return newProfile;
@@ -95,23 +96,53 @@ export const RootMutation = new GraphQLObjectType({
 
     changeProfile: {
       type: ProfileType,
-      args: { id: { type: UUIDType }, profileData: {type: changeProfileType }},
-      resolve: async (_parent, _args: IChangeProfile, _context: IContext) => {
+      args: { id: { type: UUIDType }, profileData: { type: changeProfileType } },
+      resolve: async (_, _args: IChangeProfile, _context: IContext) => {
         const db = _context.db;
-        const newProfile = await db.profile.update({where: {id: _args.id}, data: _args.profileData });
+        const newProfile = await db.profile.update({ where: { id: _args.id }, data: _args.profileData });
         return newProfile;
+      },
+    },
+    deleteProfile: {
+      type: GraphQLBoolean,
+      args: {
+        id: { type: new GraphQLNonNull(UUIDType) },
+      },
+      resolve: async (_parent, _args: IProfile, _context: IContext) => {
+        try {
+          const db = _context.db;
+          await db.profile.delete({ where: { id: _args.id } });
+        } catch (err) {
+          console.error(err);
+          return false
+        }
+        return true
       },
     },
 
     subscribeTo: {
       type: UserType,
       args: { subscriberId: { type: UUIDType }, authorId: { type: UUIDType } },
-      resolve: async (_parent, _args: userSubscribedTo, _context:IContext) => {
+      resolve: async (_parent, _args: userSubscribedTo, _context: IContext) => {
         await _context.db.subscribersOnAuthors.create({
           data: { subscriberId: _args.subscriberId, authorId: _args.authorId },
         });
         return await _context.db.user.findFirst({ where: { id: _args.subscriberId } });
       },
     },
+  unsubscribeFrom: {
+    type: GraphQLBoolean,
+    args: { subscriberId: { type: UUIDType }, authorId: { type: UUIDType } },
+    resolve: async (_parent, _args: userSubscribedTo, _context: IContext) => {
+      try {
+        await _context.db.subscribersOnAuthors.deleteMany({
+          where:{ subscriberId: _args.subscriberId, authorId: _args.authorId },
+        });
+      } catch (err) {
+        return false;
+      }
+      return true;
+    },
   },
+}
 });
